@@ -1,0 +1,37 @@
+package demo.mr;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public  class MyReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+	static Logger log = LoggerFactory.getLogger(MyReducer.class);
+
+	private IntWritable result = new IntWritable();
+
+	@Override
+	protected void setup(Reducer<Text, IntWritable, Text, IntWritable>.Context context)
+			throws IOException, InterruptedException {
+		log.info("MyReducer: setup");
+	}
+
+	public void reduce(Text key, Iterable<IntWritable> values, Context context)
+			throws IOException, InterruptedException {
+		int sum = 0;
+		for (IntWritable val : values) {
+			sum += val.get();
+		}
+		result.set(sum);
+		log.info("MyReducerer:key:" + key.toString() + "->value:" + result.get());
+		context.write(key, result);
+	}
+	@Override
+	protected void cleanup(Reducer<Text, IntWritable, Text, IntWritable>.Context context)
+			throws IOException, InterruptedException {
+		log.info("MyReducer: cleanup");
+	}
+}
