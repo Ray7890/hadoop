@@ -1,0 +1,36 @@
+package demo.mr;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+public class MyMapper extends Mapper<Object, Text, Text, IntWritable> {
+	static Logger log = LoggerFactory.getLogger(MyMapper.class);
+
+	private final static IntWritable one = new IntWritable(1);
+	private Text word = new Text();
+
+	public void setup(Object key, Text value, Context context) throws IOException, InterruptedException {
+		log.info("MyMapper setup");
+
+	}
+
+	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+		String[] words = value.toString().split(" ");
+		for (String wordStr : words) {
+			word.set(wordStr);
+			log.info("MyMapper:key:" + word.toString() + "->value:" + one);
+			context.write(word, one);
+		}
+	}
+
+	protected void cleanup(Mapper<Object, Text, Text, IntWritable>.Context context)
+			throws IOException, InterruptedException {
+		log.info("MyMapper cleanup()");
+	}
+}
